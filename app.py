@@ -47,3 +47,43 @@ def main():
 
 if __name__ == "__main__":
     main()
+import streamlit as st
+import pandas as pd
+
+# Title of the application
+st.title("BudSwap - Plant & Seed Exchange")
+
+# Initialize an empty dataframe to store the listings
+# In a production app, this would be replaced by a persistent database
+listings = pd.DataFrame(columns=["Name", "Have", "Want", "Contact"])
+
+# Function to add a new listing to the dataframe
+def add_listing(name, have, want, contact):
+    global listings
+    new_entry = {"Name": name, "Have": have, "Want": want, "Contact": contact}
+    listings = listings.append(new_entry, ignore_index=True)
+
+# Check if the listings dataframe should be loaded from the session state
+if 'listings' in st.session_state:
+    listings = st.session_state['listings']
+
+# Form for users to enter their listing
+with st.form("new_listing"):
+    st.subheader("Create a New Listing")
+    name = st.text_input("Your Name")
+    have = st.text_input("What do you have to swap? (e.g., plant, seeds)")
+    want = st.text_input("What are you looking for?")
+    contact = st.text_input("Contact Information (e.g., email)")
+    
+    submitted = st.form_submit_button("Submit Listing")
+    if submitted:
+        add_listing(name, have, want, contact)
+        st.session_state['listings'] = listings  # Save to session state
+        st.success("Your listing has been added!")
+
+# Display current listings
+st.subheader("Current Listings")
+st.table(listings)
+
+# Run the Streamlit app by pasting the code into a Python script and
+# using the command: streamlit run yourscript.py
